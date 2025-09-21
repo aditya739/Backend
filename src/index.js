@@ -12,6 +12,22 @@ import{ DB_NAME} from "./constants.js";
 import connectDb from "./db/index.js";
 const app = express();
 
+connectDb()
+.then(() => {
+
+    //this will run only when db is connected
+    //and on  port we can run our server
+    app.listen(process.env.PORT, () => {
+        console.log("Server is running on port", process.env.PORT);
+    });
+})
+.catch((error) => {
+    console.error("ERROR:", error);
+    throw error;
+});
+
+
+
 
 
 
