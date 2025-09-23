@@ -6,6 +6,8 @@ import { app } from "./app.js";
 import connectDb from "./db/index.js";
 
 // Connect to DB and start the server
+console.log("ENV test:", process.env.CLOUDINARY_CLOUD_NAME, process.env.CLOUDINARY_API_KEY);
+
 connectDb()
   .then(() => {
     app.listen(process.env.PORT || 5000, () => {

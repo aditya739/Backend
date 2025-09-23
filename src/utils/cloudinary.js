@@ -1,49 +1,46 @@
-import {v2 as cloudinary} from 'cloudinary';
+// src/utils/cloudinary.js
+import dotenv from "dotenv";
+dotenv.config({ path: "./.env" });
 
-//fs is file system module which is inbuilt module of node js
-import fs from 'fs';
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
+// Configure Cloudinary with env vars
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
- // Configuration
-    cloudinary.config({ 
-        cloud_name:process.env.CLOUDINARY_CLOUD_NAME, 
-        api_key:process.env.CLOUDINARY_API_KEY, 
-        api_secret: process.env.CLOUDINARY_API_SECRET
+// Debug check
+// console.log("CLOUDINARY CONFIG USED:", {
+//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//   api_key: process.env.CLOUDINARY_API_KEY ? "✅ loaded" : "❌ missing",
+//   api_secret: process.env.CLOUDINARY_API_SECRET ? "✅ loaded" : "❌ missing",
+// });
+
+const uploadOnCloudinary = async (localFilePath) => {
+  try {
+    if (!localFilePath) return null;
+
+    // Upload file
+    const result = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "auto",
     });
 
+    // Remove temp file
+    fs.unlinkSync(localFilePath);
 
+    return result;
+  } catch (error) {
+    console.error("Cloudinary upload error:", error);
 
-
-//uploading the image to cloudinary
-//it is an async function because it returns a promise
-//it takes the path of the file as an argument
-
- const uploadOnCloudinary = async(localFilePath)=>{
-
-    //it uploads the file to cloudinary
-    try
-    {//if file path is not there
-        if(!localFilePath)return null
-        //uploading the file to cloudinary
-       const Response= await cloudinary.uploader.upload(localFilePath, {
-            //which type of file is going to upload
-            resource_type: "auto"
-        })
-  //file has been uploaded
-  console.log("file has been uploaded successfully",Response.url);
-     return Response
-
+    // Cleanup on failure
+    if (fs.existsSync(localFilePath)) {
+      fs.unlinkSync(localFilePath);
     }
-catch(error)
-{
-    fs.unlinkSync(localFilePath);//remove the locally saved temporary file as the upload opration got faild
-  return null;
-}
+    return null;
+  }
+};
 
-
-
- }
-
- export{uploadOnCloudinary}
-
-
+export { uploadOnCloudinary };
