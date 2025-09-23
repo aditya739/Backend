@@ -1,21 +1,10 @@
-const asyncHandler = (requestHandler)  => {
-    return (req, res, next) => {
-        Promise.resolve(
-            requestHandler(req, res, next)
-        ).catch((err)=>next())
-
-}
-}
-
-
-
-
-
-
-
-
-
-export { asyncHandler };
+// A simple wrapper to handle async route functions
+// A simple wrapper to handle async route functions
+export const asyncHandler = (fn) => {
+  return (req, res, next) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+};
 
 
 

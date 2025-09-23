@@ -2,34 +2,35 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
+// Create express app
 const app = express();
 
-//middleware use only when middleware is used before routes
+// Enable CORS (so frontend can talk to backend)
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:3000", // frontend URL
+    credentials: true, // allow cookies if needed
+  })
+);
 
-app.use(cors({
-    origin:process.env.FRONTEND_URL
-}));
-
-
-
-//express.json is used to parse json data
-//limit is used to limit the size of data we can send
+// Parse JSON data (limit request size to 50MB)
 app.use(express.json({ limit: "50mb" }));
 
-
-
-
-//to handle form data
-//extended true means we can send nested objects
-//limit is used to limit the size of data we can send
-//
+// Handle form-data (urlencoded)
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-
-//express.static is used to serve static files like images css js
-//by default it will look for index.html file in public folder
-//if we have other file we can access it by /filename
+// Serve static files from "public" folder
 app.use(express.static("public"));
 
+// Parse cookies
 app.use(cookieParser());
+
+// Import routes
+import userRouter from "./routes/user.routes.js";
+
+// Declare routes
+// Final endpoint will look like: /api/v1/user/register
+app.use("/api/v1/user", userRouter);
+
+// Export app so server.js can use it
 export { app };
