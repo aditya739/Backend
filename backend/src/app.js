@@ -6,24 +6,11 @@ import cookieParser from "cookie-parser";
 const app = express();
 
 // -------------------------
-// CORS (final, safe for dev)
+// CORS (simplified for Vercel)
 // -------------------------
-const allowedOrigins =
-  (process.env.CORS_ORIGIN && process.env.CORS_ORIGIN.split(",")) || [
-    "http://localhost:5173",
-  ];
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow non-browser clients or same-origin requests with no Origin header
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: true, // Allow all origins for now
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Accept"],
