@@ -11,9 +11,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js",
-    "build": "echo 'No build step required'"
+    "dev": "nodemon src/index.js"
   },
   "dependencies": {
     "@types/mongoose-aggregate-paginate-v2": "^1.0.12",
