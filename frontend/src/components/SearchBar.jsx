@@ -1,14 +1,19 @@
 import React from "react";
 
-export default function SearchBar({ onSearch }) {
+export default function SearchBar({ onSearch, onYouTubeSearch }) {
   const [query, setQuery] = React.useState("");
   const [category, setCategory] = React.useState("");
   const [uploadDate, setUploadDate] = React.useState("");
   const [sortBy, setSortBy] = React.useState("newest");
+  const [searchType, setSearchType] = React.useState("local");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch({ query, category, uploadDate, sortBy });
+    if (searchType === "youtube" && onYouTubeSearch) {
+      onYouTubeSearch({ query });
+    } else {
+      onSearch({ query, category, uploadDate, sortBy });
+    }
   };
 
   return (
@@ -20,10 +25,18 @@ export default function SearchBar({ onSearch }) {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search videos..."
+              placeholder={searchType === "youtube" ? "Search YouTube..." : "Search videos..."}
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
+          <select
+            value={searchType}
+            onChange={(e) => setSearchType(e.target.value)}
+            className="border border-gray-300 rounded-lg px-4 py-2"
+          >
+            <option value="local">Local Videos</option>
+            <option value="youtube">YouTube</option>
+          </select>
           <button
             type="submit"
             className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"

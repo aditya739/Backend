@@ -161,11 +161,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
  * Multer places files in req.files (upload.fields). We handle a few possible keys for robustness.
  */
 const publishAVideo = asyncHandler(async (req, res) => {
-  // Debug info (useful while developing). Remove in production.
-  console.log("=== publishAVideo called ===");
-  console.log("Content-Type:", req.headers["content-type"]);
-  console.log("req.body keys:", Object.keys(req.body || {}));
-  console.log("req.files keys:", Object.keys(req.files || {}));
 
   const { title, description, duration } = req.body || {};
 
@@ -201,7 +196,6 @@ const publishAVideo = asyncHandler(async (req, res) => {
   try {
     videoUpload = await uploadOnCloudinary(localVideoPath, { resource_type: "auto", folder: "videos" });
   } catch (err) {
-    console.error("Video upload failed:", err);
     throw new ApiError(500, "Failed to upload video: " + (err?.message || "unknown"));
   }
 
@@ -211,7 +205,6 @@ const publishAVideo = asyncHandler(async (req, res) => {
     try {
       thumbUpload = await uploadOnCloudinary(localThumbPath, { resource_type: "image", folder: "thumbnails" });
     } catch (err) {
-      console.warn("Thumbnail upload failed (continuing without thumbnail):", err);
       thumbUpload = null;
     }
   }
@@ -316,7 +309,6 @@ const updateVideo = asyncHandler(async (req, res) => {
       const thumb = await uploadOnCloudinary(req.file.path, { resource_type: "image", folder: "thumbnails" });
       video.thumbnail = thumb?.url || thumb?.secure_url || video.thumbnail;
     } catch (err) {
-      console.warn("Thumbnail upload failed during update:", err);
       // do not block update; just warn
     }
   }

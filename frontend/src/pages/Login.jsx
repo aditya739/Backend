@@ -18,7 +18,6 @@ export default function Login(){
       login(p);
       nav("/");
     } catch (err) {
-      console.error(err);
       alert(err?.data?.message || err.message || "Login failed");
     } finally {
       setLoading(false);

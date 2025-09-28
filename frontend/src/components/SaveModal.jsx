@@ -15,7 +15,7 @@ export default function SaveModal({ videoId, onClose }) {
         const res = await api.get("/collections");
         setCollections(res?.data ?? res ?? []);
       } catch (e) {
-        console.error(e);
+        // Silently handle error
       } finally {
         setLoading(false);
       }

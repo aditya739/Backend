@@ -15,11 +15,9 @@ export function ThemeProvider({ children }) {
   React.useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(isDark));
     document.documentElement.classList.toggle("dark", isDark);
-    console.log('Theme changed to:', isDark ? 'dark' : 'light');
   }, [isDark]);
 
   const toggleTheme = () => {
-    console.log('Toggling theme from', isDark, 'to', !isDark);
     setIsDark(!isDark);
   };
 

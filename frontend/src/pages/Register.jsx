@@ -29,7 +29,6 @@ export default function Register(){
       alert("Registered. Please login.");
       nav("/login");
     } catch (err) {
-      console.error(err);
       alert(err?.data?.message || err.message || "Registration failed");
     } finally {
       setLoading(false);

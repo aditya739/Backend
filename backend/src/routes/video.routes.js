@@ -16,29 +16,22 @@ import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-router.use(verifyJWT);
+// Public routes (no auth required)
+router.get("/", getAllVideos);
+router.get("/:videoId", getVideoById);
+router.get("/recommendations/:videoId", getRecommendations);
+router.get("/users/:userId/profile", getUserProfile);
 
-router
-  .route("/")
-  .get(getAllVideos)
-  .post(
-    // MUST match keys used by frontend: "videoFile" and "thumbnail"
-    upload.fields([
-      { name: "videoFile", maxCount: 1 },
-      { name: "thumbnail", maxCount: 1 }
-    ]),
-    publishAVideo
-  );
+// Protected routes (auth required)
+router.post("/", verifyJWT, upload.fields([
+  { name: "videoFile", maxCount: 1 },
+  { name: "thumbnail", maxCount: 1 }
+]), publishAVideo);
 
-router
-  .route("/:videoId")
-  .get(getVideoById)
-  .delete(deleteVideo)
-  .patch(upload.single("thumbnail"), updateVideo);
+router.delete("/:videoId", verifyJWT, deleteVideo);
+router.patch("/:videoId", verifyJWT, upload.single("thumbnail"), updateVideo);
 
-router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
-router.route("/:videoId/react").post(reactToVideo);
-router.route("/recommendations/:videoId").get(getRecommendations);
-router.route("/users/:userId/profile").get(getUserProfile);
+router.patch("/toggle/publish/:videoId", verifyJWT, togglePublishStatus);
+router.post("/:videoId/react", verifyJWT, reactToVideo);
 
 export default router;

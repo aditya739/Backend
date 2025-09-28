@@ -14,7 +14,7 @@ export default function Trending() {
         const res = await api.get(`/trending?timeframe=${timeframe}`);
         setVideos(res?.data ?? res ?? []);
       } catch (e) {
-        console.error(e);
+        // Silently handle error
       } finally {
         setLoading(false);
       }

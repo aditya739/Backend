@@ -64,7 +64,6 @@ export default function Upload(){
       alert("Uploaded successfully");
       nav(`/videos/${created._id || created.id}`);
     } catch (err) {
-      console.error("Upload failed:", err);
       setError(err?.message || "Upload failed");
     } finally {
       setLoading(false);

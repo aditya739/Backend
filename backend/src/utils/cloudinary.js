@@ -75,11 +75,11 @@ export async function uploadOnCloudinary(source, options = {}) {
       // For very large files you may prefer cloudinary.uploader.upload_large(source, uploadOptions)
       const response = await cloudinary.uploader.upload(source, uploadOptions);
 
-      // ✅ remove temp file asynchronously — ignore unlink errors but log them
+      // ✅ remove temp file asynchronously — ignore unlink errors
       try {
         await fs.unlink(source);
       } catch (unlinkErr) {
-        console.warn("uploadOnCloudinary: failed to remove temp file:", source, unlinkErr?.message || unlinkErr);
+        // Silently ignore unlink errors
       }
 
       return {

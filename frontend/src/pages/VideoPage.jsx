@@ -28,7 +28,6 @@ export default function VideoPage(){
         const obj = res?.data ?? res;
         if (mounted) setVideo(obj);
       } catch (err) {
-        console.error(err);
         if (mounted) setError("Unable to load video. Is the backend running?");
       } finally {
         if (mounted) setLoading(false);

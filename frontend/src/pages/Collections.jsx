@@ -14,7 +14,7 @@ export default function Collections() {
         const res = await api.get("/collections");
         setCollections(res?.data ?? res ?? []);
       } catch (e) {
-        console.error(e);
+        // Silently handle error
       } finally {
         setLoading(false);
       }

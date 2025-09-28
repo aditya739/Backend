@@ -21,7 +21,6 @@ export default function Comments({ videoId }) {
         const arr = res?.data?.comments ?? res?.comments ?? res ?? [];
         if (mounted) setComments(Array.isArray(arr) ? arr : []);
       } catch (e) {
-        console.error(e);
         if (mounted) setError(e?.message || "Unable to fetch comments.");
       } finally {
         if (mounted) setLoading(false);
@@ -42,7 +41,6 @@ export default function Comments({ videoId }) {
       setComments(prev => [posted, ...prev]);
       setText("");
     } catch (e) {
-      console.error(e);
       alert(e?.message || "Unable to post comment.");
     } finally {
       setPosting(false);

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../services/auth.jsx";
 import SaveModal from "../components/SaveModal.jsx";
 import SearchBar from "../components/SearchBar.jsx";
+import YouTubeEmbed from "../components/YouTubeEmbed.jsx";
 
 function VideoCard({ v }) {
   const { user } = useAuth();
@@ -48,7 +49,9 @@ function VideoCard({ v }) {
 
 export default function Home() {
   const [videos, setVideos] = React.useState([]);
+  const [youtubeVideos, setYoutubeVideos] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [youtubeLoading, setYoutubeLoading] = React.useState(true);
   const [error, setError] = React.useState("");
   const [searchQuery, setSearchQuery] = React.useState("");
   const [sortBy, setSortBy] = React.useState("newest");
@@ -67,21 +70,48 @@ export default function Home() {
       const arr = res?.data?.videos ?? res?.videos ?? res ?? [];
       setVideos(Array.isArray(arr) ? arr : []);
     } catch (err) {
-      console.error(err);
       setError("Unable to fetch videos. Is the backend running?");
     } finally {
       setLoading(false);
     }
   }, []);
 
+  const fetchYouTubeVideos = React.useCallback(async () => {
+    setYoutubeLoading(true);
+    try {
+      const res = await api.get("/youtube/trending?maxResults=6");
+      const items = res?.data?.items || [];
+      setYoutubeVideos(items);
+    } catch (err) {
+      // Silently handle YouTube API errors
+    } finally {
+      setYoutubeLoading(false);
+    }
+  }, []);
+
   React.useEffect(() => {
     fetchVideos();
-  }, [fetchVideos]);
+    fetchYouTubeVideos();
+  }, [fetchVideos, fetchYouTubeVideos]);
 
   const handleSearch = (params) => {
     setSearchQuery(params.query || "");
     setSortBy(params.sortBy || "newest");
     fetchVideos(params);
+  };
+
+  const handleYouTubeSearch = async (params) => {
+    if (!params.query) return;
+    setYoutubeLoading(true);
+    try {
+      const res = await api.get(`/youtube/search?q=${encodeURIComponent(params.query)}&maxResults=6`);
+      const items = res?.data?.items || [];
+      setYoutubeVideos(items);
+    } catch (err) {
+      setYoutubeVideos([]);
+    } finally {
+      setYoutubeLoading(false);
+    }
   };
 
   return (
@@ -97,7 +127,7 @@ export default function Home() {
         </Link>
       </section>
       
-      <SearchBar onSearch={handleSearch} />
+      <SearchBar onSearch={handleSearch} onYouTubeSearch={handleYouTubeSearch} />
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -118,6 +148,35 @@ export default function Home() {
           {videos.map(v => <VideoCard key={v._id} v={v} />)}
         </div>
       )}
+      
+      {/* YouTube Trending Section */}
+      <section className="mt-12">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Trending on YouTube</h2>
+        {youtubeLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({length:6}).map((_,i)=>(
+              <div key={i} className="rounded-xl bg-gray-100 animate-pulse h-64" />
+            ))}
+          </div>
+        ) : youtubeVideos.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="text-gray-500">Unable to load YouTube videos</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {youtubeVideos.map(video => (
+              <div key={video.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
+                <YouTubeEmbed videoId={video.id} title={video.snippet?.title} />
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-900 line-clamp-2 mb-1">{video.snippet?.title}</h3>
+                  <p className="text-sm text-gray-500">{video.snippet?.channelTitle}</p>
+                  <p className="text-xs text-gray-400 mt-1">{parseInt(video.statistics?.viewCount || 0).toLocaleString()} views</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
