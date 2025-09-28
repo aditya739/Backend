@@ -1,20 +1,8 @@
 // src/middlewares/multer.middleware.js
 import multer from "multer";
-import fs from "fs";
-import path from "path";
 
-const uploadPath = path.join(process.cwd(), "public", "temp");
-if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, uploadPath);
-  },
-  filename(req, file, cb) {
-    const safe = file.originalname.replace(/\s+/g, "_");
-    cb(null, `${Date.now()}-${safe}`);
-  }
-});
+// Use memory storage for Vercel serverless environment
+const storage = multer.memoryStorage();
 
 export const upload = multer({
   storage,

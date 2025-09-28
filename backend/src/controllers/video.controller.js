@@ -177,11 +177,11 @@ const publishAVideo = asyncHandler(async (req, res) => {
     throw new ApiError(400, `Video file is required. Received file keys: ${present}`);
   }
 
-  // local temp paths saved by multer
-  const localVideoPath = videoFileObj.path;
+  // For memory storage, we have buffer instead of path
+  const videoBuffer = videoFileObj.buffer;
   // optional thumbnail
   const thumbnailObj = req.files && req.files.thumbnail ? req.files.thumbnail[0] : null;
-  const localThumbPath = thumbnailObj ? thumbnailObj.path : null;
+  const thumbBuffer = thumbnailObj ? thumbnailObj.buffer : null;
 
   // validate text fields
   if (!title || !String(title).trim()) {
@@ -191,19 +191,19 @@ const publishAVideo = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Duration (in seconds) is required and must be a number");
   }
 
-  // Upload video to Cloudinary (resource_type: "auto" handles video)
+  // Upload video to Cloudinary using buffer
   let videoUpload;
   try {
-    videoUpload = await uploadOnCloudinary(localVideoPath, { resource_type: "auto", folder: "videos" });
+    videoUpload = await uploadOnCloudinary(videoBuffer, { resource_type: "auto", folder: "videos" });
   } catch (err) {
     throw new ApiError(500, "Failed to upload video: " + (err?.message || "unknown"));
   }
 
   // Upload thumbnail (optional). If it fails we continue (thumbnail not required)
   let thumbUpload = null;
-  if (localThumbPath) {
+  if (thumbBuffer) {
     try {
-      thumbUpload = await uploadOnCloudinary(localThumbPath, { resource_type: "image", folder: "thumbnails" });
+      thumbUpload = await uploadOnCloudinary(thumbBuffer, { resource_type: "image", folder: "thumbnails" });
     } catch (err) {
       thumbUpload = null;
     }
@@ -304,9 +304,9 @@ const updateVideo = asyncHandler(async (req, res) => {
 
   // handle thumbnail update if file present (multer single("thumbnail") used in route)
   if (req.file && req.file.mimetype && req.file.mimetype.startsWith("image")) {
-    // upload thumbnail
+    // upload thumbnail using buffer
     try {
-      const thumb = await uploadOnCloudinary(req.file.path, { resource_type: "image", folder: "thumbnails" });
+      const thumb = await uploadOnCloudinary(req.file.buffer, { resource_type: "image", folder: "thumbnails" });
       video.thumbnail = thumb?.url || thumb?.secure_url || video.thumbnail;
     } catch (err) {
       // do not block update; just warn
