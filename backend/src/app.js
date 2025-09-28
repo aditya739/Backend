@@ -59,6 +59,11 @@ import watchHistoryRouter from "./routes/watchHistory.routes.js";
 // -------------------------
 // Routes declaration
 // -------------------------
+// Root route for testing
+app.get("/", (req, res) => {
+  res.json({ message: "Cinevo Backend API is running!", status: "OK" });
+});
+
 app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/tweets", tweetRouter);
