@@ -55,6 +55,7 @@ export default function Home() {
   const [error, setError] = React.useState("");
   const [searchQuery, setSearchQuery] = React.useState("");
   const [sortBy, setSortBy] = React.useState("newest");
+  const [showTrending, setShowTrending] = React.useState(true);
 
   const fetchVideos = React.useCallback(async (params = {}) => {
     setLoading(true);
@@ -91,8 +92,10 @@ export default function Home() {
 
   React.useEffect(() => {
     fetchVideos();
-    fetchYouTubeVideos();
-  }, [fetchVideos, fetchYouTubeVideos]);
+    if (showTrending) {
+      fetchYouTubeVideos();
+    }
+  }, [fetchVideos, fetchYouTubeVideos, showTrending]);
 
   const handleSearch = (params) => {
     setSearchQuery(params.query || "");
@@ -128,6 +131,23 @@ export default function Home() {
       </section>
       
       <SearchBar onSearch={handleSearch} onYouTubeSearch={handleYouTubeSearch} />
+      
+      {/* Trending Toggle */}
+      <div className="flex items-center justify-between bg-white rounded-xl border border-gray-200 p-4 mb-6">
+        <div>
+          <h3 className="font-semibold text-gray-900">YouTube Trending Videos</h3>
+          <p className="text-sm text-gray-500">Show trending videos from YouTube</p>
+        </div>
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            checked={showTrending}
+            onChange={(e) => setShowTrending(e.target.checked)}
+            className="sr-only peer"
+          />
+          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+        </label>
+      </div>
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -150,8 +170,9 @@ export default function Home() {
       )}
       
       {/* YouTube Trending Section */}
-      <section className="mt-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Trending on YouTube</h2>
+      {showTrending && (
+        <section className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Trending on YouTube</h2>
         {youtubeLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({length:6}).map((_,i)=>(
@@ -176,7 +197,8 @@ export default function Home() {
             ))}
           </div>
         )}
-      </section>
+        </section>
+      )}
     </div>
   );
 }
