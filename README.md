@@ -4,7 +4,7 @@ A modern, full-stack video sharing platform built with React and Node.js. Upload
 
 ## 🚀 Live Demo
 
-[Live Demo Link - Coming Soon](#) <!-- Add your live demo link here -->
+[Live Demo Link ](https://cinevo-xi.vercel.app/) <!-- Add your live demo link here -->
 
 ## ✨ Features
 
@@ -219,7 +219,7 @@ This project is licensed under the ISC License.
 
 ## 👨‍💻 Author
 
-**Your Name** - [GitHub Profile](#) | [LinkedIn](#) | [Email](#)
+**ADITYA SINGH** 
 
 ## 🙏 Acknowledgments
 
