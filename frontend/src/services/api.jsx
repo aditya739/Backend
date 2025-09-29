@@ -1,11 +1,9 @@
 const API_BASE = "https://cinevobackend.vercel.app/api/v1";
-console.log('API_BASE:', API_BASE);
 
 
 
 async function request(path, { method = "GET", body, token, signal, headers = {} } = {}) {
   const url = API_BASE + path;
-  console.log('Making request to:', url);
   const opts = { method, headers: { ...headers }, signal };
 
   // send cookies (for httpOnly tokens)
