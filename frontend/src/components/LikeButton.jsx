@@ -13,17 +13,15 @@ export default function LikeButton({ videoId, initialLikes = 0, initialDislikes 
     
     try {
       const newReaction = reaction === type ? null : type;
-      await api.post(`/videos/${videoId}/react`, { type: newReaction });
+      const response = await api.post(`/videos/${videoId}/react`, { type: newReaction });
       
-      // Update counts
-      if (reaction === "like" && newReaction !== "like") setLikes(prev => prev - 1);
-      if (reaction === "dislike" && newReaction !== "dislike") setDislikes(prev => prev - 1);
-      if (newReaction === "like" && reaction !== "like") setLikes(prev => prev + 1);
-      if (newReaction === "dislike" && reaction !== "dislike") setDislikes(prev => prev + 1);
-      
-      setReaction(newReaction);
+      // Update from server response
+      const { likes: newLikes, dislikes: newDislikes, userReaction } = response.data.data;
+      setLikes(Math.max(0, newLikes || 0));
+      setDislikes(Math.max(0, newDislikes || 0));
+      setReaction(userReaction);
     } catch (e) {
-      alert(e?.message || "Failed to react");
+      alert(e?.response?.data?.message || "Failed to react");
     }
   };
 

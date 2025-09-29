@@ -386,33 +386,39 @@ const reactToVideo = asyncHandler(async (req, res) => {
   if (!type) {
     // Remove reaction
     if (existingReaction) {
+      const updateObj = {};
       if (existingReaction.type === 'like') {
-        await Video.findByIdAndUpdate(videoId, { $inc: { likes: -1 } });
+        updateObj.$inc = { likes: -1 };
+        updateObj.$max = { likes: 0 };
       } else {
-        await Video.findByIdAndUpdate(videoId, { $inc: { dislikes: -1 } });
+        updateObj.$inc = { dislikes: -1 };
+        updateObj.$max = { dislikes: 0 };
       }
+      await Video.findByIdAndUpdate(videoId, updateObj);
       await Reaction.findByIdAndDelete(existingReaction._id);
     }
   } else {
     if (existingReaction) {
-      // Update existing reaction
+      // Update existing reaction only if different
       if (existingReaction.type !== type) {
+        const updateObj = {};
         if (existingReaction.type === 'like') {
-          await Video.findByIdAndUpdate(videoId, { $inc: { likes: -1, dislikes: 1 } });
+          updateObj.$inc = { likes: -1, dislikes: 1 };
+          updateObj.$max = { likes: 0 };
         } else {
-          await Video.findByIdAndUpdate(videoId, { $inc: { likes: 1, dislikes: -1 } });
+          updateObj.$inc = { likes: 1, dislikes: -1 };
+          updateObj.$max = { dislikes: 0 };
         }
+        await Video.findByIdAndUpdate(videoId, updateObj);
         existingReaction.type = type;
         await existingReaction.save();
       }
     } else {
       // Create new reaction
       await Reaction.create({ user: req.user._id, video: videoId, type });
-      if (type === 'like') {
-        await Video.findByIdAndUpdate(videoId, { $inc: { likes: 1 } });
-      } else {
-        await Video.findByIdAndUpdate(videoId, { $inc: { dislikes: 1 } });
-      }
+      const updateObj = { $inc: {} };
+      updateObj.$inc[type === 'like' ? 'likes' : 'dislikes'] = 1;
+      await Video.findByIdAndUpdate(videoId, updateObj);
     }
   }
 
