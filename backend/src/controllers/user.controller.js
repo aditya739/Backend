@@ -62,14 +62,14 @@ if (existedUser) {
 }
 
 
-  const avatarLocalPath = req.files?.avatar?.[0]?.path;
-  const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
+  const avatarFile = req.files?.avatar?.[0];
+  const coverImageFile = req.files?.coverImage?.[0];
 
-  if (!avatarLocalPath) throw new ApiError(400, "Avatar file is required");
+  if (!avatarFile) throw new ApiError(400, "Avatar file is required");
 
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
-  const coverImage = coverImageLocalPath
-    ? await uploadOnCloudinary(coverImageLocalPath)
+  const avatar = await uploadOnCloudinary(avatarFile.buffer);
+  const coverImage = coverImageFile
+    ? await uploadOnCloudinary(coverImageFile.buffer)
     : null;
 
   if (!avatar) throw new ApiError(500, "Avatar upload failed");
@@ -288,10 +288,10 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
    UPDATE AVATAR
 ------------------------------------------------------ */
 const updateUserAvatar = asyncHandler(async (req, res) => {
-  const avatarLocalPath = req.file?.path;
-  if (!avatarLocalPath) throw new ApiError(400, "Avatar file is missing");
+  const avatarFile = req.file;
+  if (!avatarFile) throw new ApiError(400, "Avatar file is missing");
 
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
+  const avatar = await uploadOnCloudinary(avatarFile.buffer);
   if (!avatar) throw new ApiError(401, "Error while uploading avatar");
 
   const user = await User.findByIdAndUpdate(
@@ -309,11 +309,11 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
    UPDATE COVER IMAGE
 ------------------------------------------------------ */
 const updateUserCoverImage = asyncHandler(async (req, res) => {
-  const coverImageLocalPath = req.file?.path;
-  if (!coverImageLocalPath)
+  const coverImageFile = req.file;
+  if (!coverImageFile)
     throw new ApiError(400, "Cover image file is missing");
 
-  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  const coverImage = await uploadOnCloudinary(coverImageFile.buffer);
   if (!coverImage)
     throw new ApiError(401, "Error while uploading cover image");
 
